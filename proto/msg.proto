@@ -1,0 +1,22 @@
+package demo;
+
+message str_list {
+    repeated string elements = 1;
+}
+
+message num_list {
+    repeated uint64 elements = 1;
+}
+
+message params_map {
+    required uint64   key    = 1;
+    optional str_list svalue = 2;
+    optional num_list nvalue = 3;
+}
+
+message demo_msg {
+    required uint64 src_id     = 1;
+    required uint64 cmd        = 2;
+    required uint64 seq_num    = 3;
+    repeated params_map params = 4;
+}
