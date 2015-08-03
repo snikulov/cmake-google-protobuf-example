@@ -3,38 +3,40 @@
 
 using namespace std;
 
-void add_param(demo::params_map* elm, unsigned long key, unsigned long val)
+template <typename T1, typename T2, typename T3>
+void add_param(T1* elm, T2 key, T3 val)
 {
     elm->set_key(key);
-    elm->mutable_nvalue()->add_elements(val);
-}
-
-void add_param(demo::params_map* elm, unsigned long key, const std::string& val)
-{
-    elm->set_key(key);
-    elm->mutable_svalue()->add_elements(val);
+    elm->mutable_value()->add_elements(val);
 }
 
 void show_demo_message(const demo::demo_msg& msg)
 {
     std::cout << "cmd=" << msg.cmd() << " seq_num=" << msg.seq_num() << " src_id="<< msg.src_id() << std::endl;
-    for(int i = 0; i < msg.params_size(); ++i)
+    for(int i = 0; i < msg.sparams_size(); ++i)
     {
         std::cout << "param element " << i+1 << std::endl;
-        std::cout << "key=" << msg.params(i).key() << " {";
-        int elm_size = msg.params(i).nvalue().elements_size();
+        std::cout << "key=" << msg.sparams(i).key() << " {";
+        int elm_size = msg.sparams(i).value().elements_size();
         for(int j=0; j < elm_size; ++j)
         {
-            std::cout << msg.params(i).nvalue().elements(j) << (j < elm_size-1 ? "," : "");
-        }
-
-        elm_size = msg.params(i).svalue().elements_size();
-        for(int j=0; j < elm_size; ++j)
-        {
-            std::cout << msg.params(i).svalue().elements(j) << (j < elm_size-1 ? "," : "");
+            std::cout << msg.sparams(i).value().elements(j) << (j < elm_size-1 ? "," : "");
         }
         std::cout << "}" << std::endl;
     }
+
+    for(int i = 0; i < msg.nparams_size(); ++i)
+    {
+        std::cout << "param element " << i+1 << std::endl;
+        std::cout << "key=" << msg.nparams(i).key() << " {";
+        int elm_size = msg.nparams(i).value().elements_size();
+        for(int j=0; j < elm_size; ++j)
+        {
+            std::cout << msg.nparams(i).value().elements(j) << (j < elm_size-1 ? "," : "");
+        }
+        std::cout << "}" << std::endl;
+    }
+
 }
 
 int main(int argc, char** argv)
@@ -47,15 +49,20 @@ int main(int argc, char** argv)
     message.set_src_id(3456);
     message.set_seq_num(1111);
 
-    demo::params_map* elm = message.add_params();
+    demo::num_params * elm = message.add_nparams();
     add_param(elm, 1, 1);
     add_param(elm, 1, 2);
     add_param(elm, 1, 3);
 
-    elm = message.add_params();
-    add_param(elm, 2, "one");
-    add_param(elm, 2, "two");
-    add_param(elm, 2, "three");
+    elm = message.add_nparams();
+    add_param(elm, 3, 1);
+    add_param(elm, 3, 2);
+    add_param(elm, 3, 3);
+
+    demo::str_params * selm = message.add_sparams();
+    add_param(selm, 2, "one");
+    add_param(selm, 2, "two");
+    add_param(selm, 2, "three");
 
     std::cout << "Message size in bytes: " << message.ByteSize() << std::endl;
 
